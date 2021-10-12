@@ -1,8 +1,11 @@
 #schelling segregation model
+#resourses: http://nifty.stanford.edu/2014/mccown-schelling-model-segregation/
+# https://en.wikipedia.org/wiki/Schelling%27s_model_of_segregation
 
 import random
 import numpy as np
 import matplotlib.pyplot as plt
+import copy
 from matplotlib.animation import FuncAnimation
 
 #create an nxn board
@@ -19,30 +22,34 @@ def createGrid(gridSize):
 
 #agents in group A prefer a fraction around them to be of the same group
 
-#initialize beginning diversity tolerance
-tol = 0.5
-
 #take the position and grid and return the count for the group you're looking for
 
 #create an array of neighbors
-def neighbors(rowNumber, columnNumber, grid):
+def neighbors(radius, rowNumber, columnNumber, grid):
      return [[grid[i][j] if  i >= 0 and i < len(grid) and j >= 0 and j < len(grid[0]) else 0
-                for j in range(columnNumber-2, columnNumber+1)]
-                    for i in range(rowNumber-2, rowNumber+1)]
+                for j in range(columnNumber-radius, columnNumber+1+radius)]
+                    for i in range(rowNumber-radius, rowNumber+1+radius)]
 
 #Does the agent want to move because the number of outGroup is larger than tolerance?
-def agentWantsMove(posX, posY, grid):
-    nieghborhood = neighbors(posX, posY, grid)
-    inGroup = nieghborhood[1][1]
-    inGroupCount = -1 #the neighbors array returns the agent itself, so always subtract one
+def agentWantsMove(posX, posY, grid, tol):
+    neighborhood = neighbors(1, posX, posY, grid)
+    # print('hood', end=' ')
+    # print(neighborhood)
+    inGroup = neighborhood[1][1]
+    inGroupCount = 0 
     outGroupCount = 0
     for i in range(0,3):
         for j in range(0,3):
-            if nieghborhood[i][j] == inGroup:
-                inGroupCount += 1
-            elif nieghborhood[i][j] != 0:
-                outGroupCount += 1
-    return outGroupCount / (outGroupCount + inGroupCount) > tol
+            if not(i == 1 and j == 1): #don't count the middle agent
+                if neighborhood[i][j] == inGroup:
+                    inGroupCount += 1
+                elif neighborhood[i][j] != 0:
+                    outGroupCount += 1
+    totalNeighbors = outGroupCount + inGroupCount
+    if totalNeighbors > 0:
+        return inGroupCount / totalNeighbors < tol
+    else:
+        return False #Agent has NO neighbors, lonely, but choosing not to move
 
 # if an agent is surrounded by more agents of a different group than the fraction set, 
 # then they'll choose to move to a vacant spot
@@ -59,22 +66,35 @@ def agentShuffle(movingAgents, openLocations, grid):
 def nextRound(grid):
     movingAgents = []
     openLocations = []
+    #initialize beginning diversity tolerance
+    tol = 0.5
+    # return grid
     for i in range(len(grid)):
         for j in range(len(grid[0])):
             if grid[i][j] != 0:
-                if agentWantsMove(i,j,grid):
+                # print(i,j,agentWantsMove(i,j,grid,tol))
+                if agentWantsMove(i,j,grid,tol):
                     movingAgents.append([i, j])
             else:
                 openLocations.append([i,j])
+    if len(movingAgents) == 0:
+        print("Not sure what to do now, everyone is satisfied") #all agents are satisfied
     return agentShuffle(movingAgents, openLocations, grid)
 
-def main():
-    grid = createGrid(9)
-    for i in range(0,3):
-        grid = nextRound(grid)
-        plt.imshow(grid)
-        plt.colorbar()
-        plt.show()
-    return grid
+
+#troubelshooting area
+
+# grid = [[1, 1, 2], [0, 2, 2], [2, 0, 0]]
+# print(grid)
+# print(nextRound(grid))
+# def main():
+#     grid = [[1, 1, 2], [0, 2, 2], [2, 0, 0]]
+#     for i in range(0,5):
+#         print(grid)
+#         plt.imshow(grid)
+#         plt.colorbar()
+#         plt.show()
+#         grid = nextRound(grid)
+#     return grid
 
 # print(main())

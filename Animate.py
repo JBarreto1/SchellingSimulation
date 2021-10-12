@@ -10,9 +10,9 @@ import copy
 
 import schelling
 
-fps = 10
-nSeconds = 5
-grid = schelling.createGrid(9)
+fps = 5
+nSeconds = 3
+grid = schelling.createGrid(10)
 plot=[grid]
 for _ in range((nSeconds * fps) - 1):
     newGrid = copy.deepcopy(schelling.nextRound(grid)) 
@@ -44,7 +44,7 @@ anim = animation.FuncAnimation(
                                interval = 1000 / fps, # in ms
                                )
 
-writergif = animation.PillowWriter(fps=30)
+writergif = animation.PillowWriter(fps=fps)
 anim.save('filename.gif',writer=writergif)
 
 print('Done!')
