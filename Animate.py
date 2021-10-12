@@ -12,7 +12,7 @@ import schelling
 
 fps = 5
 nSeconds = 3
-grid = schelling.createGrid(10)
+grid = schelling.createGrid(10,.5,.1)
 plot=[grid]
 for _ in range((nSeconds * fps) - 1):
     newGrid = copy.deepcopy(schelling.nextRound(grid)) 

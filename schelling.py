@@ -11,13 +11,28 @@ from matplotlib.animation import FuncAnimation
 #create an nxn board
 #populate randomly with two different groups
 
-def createGrid(gridSize):
+def createGrid(gridSize,groupRatio,percentEmpty):
     grid = []
+    totalSpaces = gridSize * gridSize
+    emptySpaces = int(totalSpaces * percentEmpty)
+    occupiedSpaces = totalSpaces - emptySpaces
+    groupOne = int(occupiedSpaces * groupRatio)
+    groupTwo = occupiedSpaces - groupOne
+    agentsChoice = [0,1,2]
     for i in range(0,gridSize):
         row = []
         for j in range(0,gridSize):
-            row.append(random.randint(0,2))
+            choice = random.choices(agentsChoice, weights = [emptySpaces, groupOne, groupTwo], k = 1)
+            row.append(choice[0])
+            if choice == [0]:
+                emptySpaces -= 1
+            elif choice == [1]:
+                groupOne -= 1
+            elif choice == [2]:
+                groupTwo -= 1
+            # row.append(random.randint(0,2))
         grid.append(row)
+    # print(groupOne,groupTwo,emptySpaces)
     return grid
 
 #agents in group A prefer a fraction around them to be of the same group
@@ -55,6 +70,7 @@ def agentWantsMove(posX, posY, grid, tol):
 # then they'll choose to move to a vacant spot
 
 def agentShuffle(movingAgents, openLocations, grid):
+    print(openLocations)
     for i in range(len(movingAgents)):
         newHome = random.randint(0,len(openLocations)-1) #pick a random number in the available "addresses" for the agent to move to
         grid[openLocations[newHome][0]][openLocations[newHome][1]] = grid[movingAgents[i][0]][movingAgents[i][1]]
@@ -78,7 +94,7 @@ def nextRound(grid):
             else:
                 openLocations.append([i,j])
     if len(movingAgents) == 0:
-        print("Not sure what to do now, everyone is satisfied") #all agents are satisfied
+        print("Found the end") #all agents are satisfied
     return agentShuffle(movingAgents, openLocations, grid)
 
 
@@ -88,9 +104,10 @@ def nextRound(grid):
 # print(grid)
 # print(nextRound(grid))
 # def main():
-#     grid = [[1, 1, 2], [0, 2, 2], [2, 0, 0]]
+#     # grid = [[1, 1, 2], [0, 2, 2], [2, 0, 0]]
+#     grid = createGrid(10,.5,1/3)
+#     # print(grid)
 #     for i in range(0,5):
-#         print(grid)
 #         plt.imshow(grid)
 #         plt.colorbar()
 #         plt.show()
@@ -98,3 +115,5 @@ def nextRound(grid):
 #     return grid
 
 # print(main())
+
+
