@@ -10,18 +10,39 @@ import copy
 
 import schelling
 
-fps = 5
-nSeconds = 3
-grid = schelling.createGrid(10,.5,.1)
+#initialize model parameters
+gridSize = 50
+tol = .3
+groupRatio = .5
+percentEmpty = .1
+
+fps = 7
+# nSeconds = 4
+grid = schelling.createGrid(gridSize,groupRatio,percentEmpty)
 plot=[grid]
-for _ in range((nSeconds * fps) - 1):
-    newGrid = copy.deepcopy(schelling.nextRound(grid)) 
-    plot.append(newGrid)
-    grid = newGrid
-# plot = [nextRound(grid) for _ in range( nSeconds * fps ) ]
-# for i in range(len(plot)):
-#     print(i, end=' ')
-#     print(plot[i])
+# for _ in range((nSeconds * fps) - 1):
+#     newGrid = copy.deepcopy(schelling.nextRound(grid)) 
+#     plot.append(newGrid)
+#     grid = newGrid
+
+i = 0
+endNotFound = True
+maxIter = 40 #don't let it run away if something is wrong and it takes a long time
+while endNotFound and i < maxIter:
+    #build the series of plots and either get to a point where all agents are satisfied or max iterations is hit
+    newGrid = copy.deepcopy(schelling.nextRound(grid, tol)) 
+    if newGrid:
+        plot.append(newGrid)
+        grid = newGrid
+        i += 1
+    else:
+        endNotFound = False
+
+#keep the GIF to a whole number of seconds, and use the remainder time to show the steady state grid (all satisfied agents)
+for i in range(fps - (len(plot) % fps)):
+    plot.append(grid)
+
+nSeconds = int(len(plot) / fps)
 
 # First set up the figure, the axis, and the plot element we want to animate
 fig = plt.figure( figsize=(9,9) )

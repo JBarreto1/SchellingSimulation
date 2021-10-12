@@ -70,7 +70,6 @@ def agentWantsMove(posX, posY, grid, tol):
 # then they'll choose to move to a vacant spot
 
 def agentShuffle(movingAgents, openLocations, grid):
-    print(openLocations)
     for i in range(len(movingAgents)):
         newHome = random.randint(0,len(openLocations)-1) #pick a random number in the available "addresses" for the agent to move to
         grid[openLocations[newHome][0]][openLocations[newHome][1]] = grid[movingAgents[i][0]][movingAgents[i][1]]
@@ -79,11 +78,11 @@ def agentShuffle(movingAgents, openLocations, grid):
         openLocations.append([movingAgents[i][0],movingAgents[i][1]])
     return grid
 
-def nextRound(grid):
+def nextRound(grid, tol):
     movingAgents = []
     openLocations = []
     #initialize beginning diversity tolerance
-    tol = 0.5
+    # tol = 0.3
     # return grid
     for i in range(len(grid)):
         for j in range(len(grid[0])):
@@ -94,7 +93,8 @@ def nextRound(grid):
             else:
                 openLocations.append([i,j])
     if len(movingAgents) == 0:
-        print("Found the end") #all agents are satisfied
+        # print("Found the end") #all agents are satisfied
+        return False
     return agentShuffle(movingAgents, openLocations, grid)
 
 
