@@ -25,18 +25,16 @@ plot=[grid]
 #     plot.append(newGrid)
 #     grid = newGrid
 
-i = 0
 endNotFound = True
 maxIter = 40 #don't let it run away if something is wrong and it takes a long time
-while endNotFound and i < maxIter:
+for i in range(maxIter):
     #build the series of plots and either get to a point where all agents are satisfied or max iterations is hit
     newGrid = copy.deepcopy(schelling.nextRound(grid, tol)) 
     if newGrid:
         plot.append(newGrid)
         grid = newGrid
-        i += 1
     else:
-        endNotFound = False
+        break
 
 #keep the GIF to a whole number of seconds, and use the remainder time to show the steady state grid (all satisfied agents)
 for i in range(fps - (len(plot) % fps)):
